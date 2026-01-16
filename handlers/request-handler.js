@@ -49,7 +49,8 @@ function createRequestHandler(getSites, { allowIpAccess }) {
     const site = getSiteForHost(hostname, sites);
 
     if (!site) {
-      if (allowIpAccess && net.isIP(hostname)) {
+      const isLocalhost = hostname.toLowerCase() === "localhost";
+      if (allowIpAccess && (net.isIP(hostname) || isLocalhost)) {
         const devMatch = findDevSiteFromPath(request.url || "/", sites);
         if (devMatch) {
           return serveSiteRequest(devMatch.site, devMatch.urlPath, response);
