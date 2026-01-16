@@ -1,0 +1,10 @@
+{
+  "name": "web-server",
+  "version": "1.0.0",
+  "description": "Servidor web simples com múltiplos sites.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "MIT"
+}
