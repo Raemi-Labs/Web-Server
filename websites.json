@@ -1,0 +1,11 @@
+{
+  "sites": [
+    {
+      "name": "example",
+      "root": "websites/example",
+      "domain": "example.local",
+      "index": "index.html",
+      "isDevelop": true
+    }
+  ]
+}
