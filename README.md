@@ -10,6 +10,8 @@ Servidor web simples em Node.js com Express, que inicia nas portas 80 (HTTP) e 4
 - `websites/`: diretórios raiz de cada site.
 - `certs/`: certificados padrão (fallback) usados pelo HTTPS.
 - `certificates/`: certificados por site (opcional).
+- `admin.json`: credenciais do painel admin.
+- `access.log`: logs de acesso do servidor.
 
 ## Como usar
 
@@ -39,3 +41,20 @@ Com o servidor rodando, use o console no terminal para administrar os sites:
 - `reload`: recarrega todos os sites do `websites.json`.
 - `reload-site <nome>`: recarrega e valida um site especifico.
 - `create-site <nome> <dominio> [--dev]`: cria o site, pastas e certificados.
+
+## Painel admin
+
+O painel admin roda na porta `8888` e exige autenticação básica.
+
+- Credenciais em `admin.json` (altere a senha antes de publicar).
+- Acesse em `http://localhost:8888`.
+
+Funções disponíveis:
+- Lista de sites configurados.
+- Criar site (com pastas e certificados).
+- Recarregar todos os sites ou um site específico.
+- Visualizar logs de acesso.
+
+## Licença
+
+Este projeto está licenciado sob os termos do arquivo `LICENSE`.
