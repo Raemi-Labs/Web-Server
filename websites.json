@@ -3,8 +3,10 @@
     {
       "name": "example",
       "root": "websites/example",
-      "domain": "example.local",
-      "index": "index.html"
+      "domain": "loc",
+      "index": "index.html",
+      "isDevelop": true,
+      "certificates": "certificates/example"
     }
   ]
 }
