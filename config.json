@@ -1,6 +1,5 @@
 {
   "http": 80,
   "https": 443,
-  "lang": "en",
-  "acmeEmail": ""
+  "lang": "en"
 }

@@ -33,17 +33,6 @@ function loadSites(rootDir, i18n) {
     if (site.certificates !== undefined && typeof site.certificates !== "string") {
       throw new Error(t ? t(6003) : "O campo certificates precisa ser string quando informado.");
     }
-    if (site.letsencrypt !== undefined && typeof site.letsencrypt !== "boolean") {
-      throw new Error(t ? t(6005) : "O campo letsencrypt precisa ser booleano quando informado.");
-    }
-    if (
-      site.letsencryptNextRenewal !== undefined &&
-      typeof site.letsencryptNextRenewal !== "string"
-    ) {
-      throw new Error(
-        t ? t(6006) : "O campo letsencryptNextRenewal precisa ser string quando informado."
-      );
-    }
     const domains = Array.isArray(site.domain) ? site.domain : [site.domain];
     return {
       name: site.name,
@@ -52,8 +41,6 @@ function loadSites(rootDir, i18n) {
       index: site.index,
       isDevelop: Boolean(site.isDevelop),
       certificates: site.certificates ? path.resolve(rootDir, site.certificates) : null,
-      letsencrypt: Boolean(site.letsencrypt),
-      letsencryptNextRenewal: site.letsencryptNextRenewal || null,
     };
   });
 }
@@ -71,9 +58,20 @@ function parseHostname(hostHeader) {
   return hostHeader.split(":")[0];
 }
 
+function matchesDomain(hostname, domain) {
+  if (domain === hostname) {
+    return true;
+  }
+  if (domain.startsWith("*.")) {
+    const suffix = domain.slice(2);
+    return hostname !== suffix && hostname.endsWith(`.${suffix}`);
+  }
+  return false;
+}
+
 function getSiteForHost(hostname, sites) {
   const normalized = hostname.toLowerCase();
-  return sites.find((site) => site.domains.includes(normalized)) || null;
+  return sites.find((site) => site.domains.some((domain) => matchesDomain(normalized, domain))) || null;
 }
 
 function getContentType(filePath) {

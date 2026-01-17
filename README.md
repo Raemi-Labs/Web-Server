@@ -25,10 +25,9 @@ Servidor web simples em Node.js com Express, que inicia nas portas 80 (HTTP) e 4
 
 ### Como usar ✅
 
-1. Edite o arquivo `websites.json` para apontar os sites e, se quiser, o diretório de certificados.
+1. Edite o arquivo `websites.json` para apontar os sites e, se quiser, o diretório de certificados (aceita lista e wildcard).
 2. Adicione o conteúdo do site dentro de `websites/<nome>`.
 3. (Opcional) Crie certificados por site em `certificates/<nome>/` com `cert.key` e `cert.crt`.
-4. (Opcional) Para Let's Encrypt, adicione `"letsencrypt": true` no site e configure `acmeEmail` no `config.json`.
 4. Instale as dependências:
 
 ```bash
@@ -43,6 +42,23 @@ npm start
 
 > Observação: se um site não tiver certificados válidos em `certificates/`, o HTTPS usa o fallback de `certs/` (`cert.key` e `cert.crt`).
 
+### Configuração de dominios ⚙️
+
+O campo `domain` aceita string ou lista. Tambem suporta wildcard com `*.`:
+
+```json
+{
+  "name": "raemi",
+  "root": "websites/main",
+  "domain": ["raemi.com", "www.raemi.com", "*.raemi.com"],
+  "index": "index.html",
+  "isDevelop": false,
+  "certificates": "certificates/raemi"
+}
+```
+
+Wildcard nao cobre o dominio raiz, entao mantenha o dominio principal na lista.
+
 ### Configuração do servidor ⚙️
 
 O arquivo `config.json` define as portas e o idioma do servidor:
@@ -51,14 +67,11 @@ O arquivo `config.json` define as portas e o idioma do servidor:
 {
   "http": 80,
   "https": 443,
-  "lang": "en",
-  "acmeEmail": ""
+  "lang": "en"
 }
 ```
 
 Idiomas disponíveis: `pt`, `en`, `ko`, `ja`.
-
-Campo `acmeEmail` e obrigatorio para Let's Encrypt quando `letsencrypt: true` no site.
 
 Se o idioma configurado não existir em `languages/`, o servidor usa `pt` como padrão interno.
 
@@ -124,10 +137,9 @@ Simple Node.js web server with Express that starts on ports 80 (HTTP) and 443 (H
 
 ### Usage ✅
 
-1. Edit `websites.json` to configure sites and (optionally) certificate folders.
+1. Edit `websites.json` to configure sites and (optionally) certificate folders (lists and wildcards supported).
 2. Add site content under `websites/<name>`.
 3. (Optional) Create per-site certificates in `certificates/<name>/` with `cert.key` and `cert.crt`.
-4. (Optional) For Let's Encrypt, add `"letsencrypt": true` on the site and set `acmeEmail` in `config.json`.
 4. Install dependencies:
 
 ```bash
@@ -142,6 +154,23 @@ npm start
 
 > Note: if a site does not have valid certificates in `certificates/`, HTTPS falls back to `certs/` (`cert.key` and `cert.crt`).
 
+### Domain configuration ⚙️
+
+The `domain` field accepts a string or list. Wildcards with `*.` are supported:
+
+```json
+{
+  "name": "raemi",
+  "root": "websites/main",
+  "domain": ["raemi.com", "www.raemi.com", "*.raemi.com"],
+  "index": "index.html",
+  "isDevelop": false,
+  "certificates": "certificates/raemi"
+}
+```
+
+Wildcards do not match the root domain, so keep it in the list.
+
 ### Server configuration ⚙️
 
 The `config.json` file defines server ports and language:
@@ -150,14 +179,11 @@ The `config.json` file defines server ports and language:
 {
   "http": 80,
   "https": 443,
-  "lang": "en",
-  "acmeEmail": ""
+  "lang": "en"
 }
 ```
 
 Available languages: `pt`, `en`, `ko`, `ja`.
-
-The `acmeEmail` field is required for Let's Encrypt when `letsencrypt: true` is set on a site.
 
 If the configured language does not exist in `languages/`, the server falls back to internal `pt`.
 
@@ -223,10 +249,9 @@ Node.js와 Express로 구성된 간단한 웹 서버로, 80(HTTP)과 443(HTTPS) 
 
 ### 사용 방법 ✅
 
-1. `websites.json`을 편집해 사이트와 (선택) 인증서 폴더를 설정합니다.
+1. `websites.json`을 편집해 사이트와 (선택) 인증서 폴더를 설정합니다(리스트/와일드카드 지원).
 2. 사이트 콘텐츠를 `websites/<name>` 아래에 추가합니다.
 3. (선택) `certificates/<name>/`에 `cert.key`와 `cert.crt`로 사이트별 인증서를 만듭니다.
-4. (선택) Let's Encrypt를 사용하려면 사이트에 `"letsencrypt": true`를 추가하고 `config.json`에 `acmeEmail`을 설정합니다.
 4. 의존성을 설치합니다:
 
 ```bash
@@ -241,6 +266,23 @@ npm start
 
 > 참고: 사이트에 유효한 인증서가 없으면 HTTPS는 `certs/`(`cert.key`, `cert.crt`)를 사용합니다.
 
+### 도메인 설정 ⚙️
+
+`domain` 필드는 문자열 또는 리스트를 지원합니다. `*.` 와일드카드도 사용 가능합니다:
+
+```json
+{
+  "name": "raemi",
+  "root": "websites/main",
+  "domain": ["raemi.com", "www.raemi.com", "*.raemi.com"],
+  "index": "index.html",
+  "isDevelop": false,
+  "certificates": "certificates/raemi"
+}
+```
+
+와일드카드는 루트 도메인을 포함하지 않으므로 목록에 루트 도메인을 유지하세요.
+
 ### 서버 설정 ⚙️
 
 `config.json`에서 포트와 언어를 설정합니다:
@@ -249,14 +291,11 @@ npm start
 {
   "http": 80,
   "https": 443,
-  "lang": "en",
-  "acmeEmail": ""
+  "lang": "en"
 }
 ```
 
 사용 가능한 언어: `pt`, `en`, `ko`, `ja`.
-
-`acmeEmail` 필드는 `letsencrypt: true`인 사이트에서 Let's Encrypt를 사용할 때 필요합니다.
 
 설정된 언어 파일이 `languages/`에 없으면 내부 기본값인 `pt`로 동작합니다.
 
@@ -322,10 +361,9 @@ Node.js と Express で構成されたシンプルな Web サーバーで、80(H
 
 ### 使い方 ✅
 
-1. `websites.json` を編集してサイトと(任意で)証明書フォルダを設定します。
+1. `websites.json` を編集してサイトと(任意で)証明書フォルダを設定します(リスト/ワイルドカード対応)。
 2. `websites/<name>` にサイト内容を追加します。
 3. (任意) `certificates/<name>/` に `cert.key` と `cert.crt` でサイト別証明書を作成します。
-4. (任意) Let's Encrypt を使う場合はサイトに `"letsencrypt": true` を追加し、`config.json` の `acmeEmail` を設定します。
 4. 依存関係をインストールします:
 
 ```bash
@@ -340,6 +378,23 @@ npm start
 
 > 注: サイトに有効な証明書がない場合、HTTPS は `certs/`(`cert.key`, `cert.crt`)にフォールバックします。
 
+### ドメイン設定 ⚙️
+
+`domain` は文字列または配列をサポートし、`*.` のワイルドカードにも対応します:
+
+```json
+{
+  "name": "raemi",
+  "root": "websites/main",
+  "domain": ["raemi.com", "www.raemi.com", "*.raemi.com"],
+  "index": "index.html",
+  "isDevelop": false,
+  "certificates": "certificates/raemi"
+}
+```
+
+ワイルドカードはルートドメインに一致しないため、リストにルートドメインを含めてください。
+
 ### サーバー設定 ⚙️
 
 `config.json` でポートと言語を設定します:
@@ -348,14 +403,11 @@ npm start
 {
   "http": 80,
   "https": 443,
-  "lang": "en",
-  "acmeEmail": ""
+  "lang": "en"
 }
 ```
 
 利用可能な言語: `pt`, `en`, `ko`, `ja`。
-
-`acmeEmail` は `letsencrypt: true` のサイトで Let's Encrypt を使う場合に必要です。
 
 設定された言語ファイルが `languages/` に存在しない場合、内部の `pt` にフォールバックします。
 

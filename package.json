@@ -7,10 +7,7 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "acme-http-01-webroot": "^3.2.0",
-    "express": "^4.22.1",
-    "greenlock": "^4.0.4",
-    "greenlock-store-fs": "^3.2.2"
+    "express": "^4.22.1"
   },
   "license": "MIT"
 }

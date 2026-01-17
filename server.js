@@ -9,13 +9,12 @@ const { loadSites, getSiteForHost } = require("./handlers/sites");
 const { createAccessLogger } = require("./handlers/logger");
 const { startConsole } = require("./handlers/console");
 const { createAdminApp } = require("./handlers/admin");
-const { createLetsEncryptScheduler } = require("./handlers/letsencrypt");
 const { createRequestHandler } = require("./handlers/request-handler");
 const { createHttpsOptions } = require("./handlers/tls");
 
 const rootDir = __dirname;
 const state = {
-  serverConfig: { http: 80, https: 443, lang: "pt", acmeEmail: "" },
+  serverConfig: { http: 80, https: 443, lang: "pt" },
   i18n: createI18n({ rootDir, lang: "pt" }),
   sites: [],
   httpServer: null,
@@ -24,7 +23,6 @@ const state = {
   clearCertCache: null,
   logger: null,
   logPath: null,
-  letsEncrypt: null,
 };
 
 const getSites = () => state.sites;
@@ -58,7 +56,7 @@ function ensureBaseFiles() {
 
 function loadServerConfig(baseI18n) {
   const serverConfigPath = path.join(rootDir, "config.json");
-  let serverConfig = { http: 80, https: 443, lang: "pt", acmeEmail: "" };
+  let serverConfig = { http: 80, https: 443, lang: "pt" };
   if (!fs.existsSync(serverConfigPath)) {
     return serverConfig;
   }
@@ -69,7 +67,6 @@ function loadServerConfig(baseI18n) {
       http: Number.isInteger(parsed.http) ? parsed.http : serverConfig.http,
       https: Number.isInteger(parsed.https) ? parsed.https : serverConfig.https,
       lang: typeof parsed.lang === "string" ? parsed.lang : serverConfig.lang,
-      acmeEmail: typeof parsed.acmeEmail === "string" ? parsed.acmeEmail : "",
     };
   } catch (error) {
     console.error(baseI18n.t(2006, { error: error.message }));
@@ -153,14 +150,6 @@ function startServers() {
     console.log(getI18n().t(2002, { port: 8888 }));
   });
 
-  state.letsEncrypt = createLetsEncryptScheduler({
-    rootDir,
-    getSites,
-    getI18n,
-    acmeEmail: state.serverConfig.acmeEmail || "",
-  });
-  state.letsEncrypt.start();
-  httpRequestHandler.acmeChallengeDir = state.letsEncrypt.challengeDir;
 }
 
 function closeServer(server) {
@@ -179,14 +168,10 @@ async function stopServers() {
     closeServer(state.httpsServer),
     closeServer(state.adminServer),
   ]);
-  if (state.letsEncrypt) {
-    state.letsEncrypt.stop();
-  }
   state.httpServer = null;
   state.httpsServer = null;
   state.adminServer = null;
   state.clearCertCache = null;
-  state.letsEncrypt = null;
 }
 
 async function restartServers() {

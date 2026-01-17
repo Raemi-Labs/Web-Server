@@ -180,8 +180,6 @@ function startConsole({
           index: "index.html",
           isDevelop,
           certificates: `certificates/${name}`,
-          letsencrypt: false,
-          letsencryptNextRenewal: null,
         };
         parsed.sites.push(site);
         writeConfig(configPath, parsed);
@@ -246,22 +244,6 @@ function startConsole({
           changed = true;
         }
 
-        let letsencrypt = site.letsencrypt;
-        if (typeof letsencrypt !== "boolean") {
-          letsencrypt = false;
-          changed = true;
-        }
-
-        let letsencryptNextRenewal = site.letsencryptNextRenewal;
-        if (
-          letsencryptNextRenewal !== null &&
-          letsencryptNextRenewal !== undefined &&
-          typeof letsencryptNextRenewal !== "string"
-        ) {
-          letsencryptNextRenewal = null;
-          changed = true;
-        }
-
         let isDevelop = site.isDevelop;
         if (typeof isDevelop !== "boolean") {
           isDevelop = false;
@@ -276,8 +258,6 @@ function startConsole({
           index: indexFile,
           isDevelop,
           certificates,
-          letsencrypt,
-          letsencryptNextRenewal,
         });
       }
 
