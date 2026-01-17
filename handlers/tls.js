@@ -27,11 +27,12 @@ function loadCertificateContextFromDir(baseDir) {
   }
 }
 
-function createHttpsOptions({ rootDir, getSites, getSiteForHost }) {
+function createHttpsOptions({ rootDir, getSites, getSiteForHost, i18n }) {
   const defaultDir = path.join(rootDir, "certs");
   const defaultCertificate = loadCertificateContextFromDir(defaultDir);
   if (!defaultCertificate) {
-    throw new Error("Certificados padrão não encontrados em certs/ (cert.key e cert.crt).");
+    const message = i18n ? i18n.t(6004) : "Certificados padrao nao encontrados em certs/ (cert.key e cert.crt).";
+    throw new Error(message);
   }
 
   const certCache = new Map();

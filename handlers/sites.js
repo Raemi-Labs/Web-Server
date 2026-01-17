@@ -15,22 +15,23 @@ const MIME_TYPES = {
   ".txt": "text/plain; charset=utf-8",
 };
 
-function loadSites(rootDir) {
+function loadSites(rootDir, i18n) {
+  const t = i18n ? i18n.t : null;
   const configPath = path.join(rootDir, "websites.json");
   const raw = fs.readFileSync(configPath, "utf8");
   const parsed = JSON.parse(raw);
   if (!parsed.sites || !Array.isArray(parsed.sites)) {
-    throw new Error("O arquivo websites.json precisa de uma lista 'sites'.");
+    throw new Error(t ? t(6000) : "O arquivo websites.json precisa de uma lista 'sites'.");
   }
   return parsed.sites.map((site) => {
     if (!site.name || !site.root || !site.domain || !site.index) {
-      throw new Error("Cada site precisa de name, root, domain e index.");
+      throw new Error(t ? t(6001) : "Cada site precisa de name, root, domain e index.");
     }
     if (site.isDevelop !== undefined && typeof site.isDevelop !== "boolean") {
-      throw new Error("O campo isDevelop precisa ser booleano quando informado.");
+      throw new Error(t ? t(6002) : "O campo isDevelop precisa ser booleano quando informado.");
     }
     if (site.certificates !== undefined && typeof site.certificates !== "string") {
-      throw new Error("O campo certificates precisa ser string quando informado.");
+      throw new Error(t ? t(6003) : "O campo certificates precisa ser string quando informado.");
     }
     const domains = Array.isArray(site.domain) ? site.domain : [site.domain];
     return {

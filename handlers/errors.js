@@ -1,9 +1,13 @@
-function sendErrorPage(response, statusCode, title, message, hint) {
-  const safeTitle = title || "Algo deu errado";
-  const safeMessage = message || "Não foi possível concluir sua solicitação.";
-  const safeHint = hint || "Tente novamente ou volte para a página inicial.";
-  const html = `<!doctype html>
-<html lang="pt-BR">
+function createErrorHandlers(i18n) {
+  const t = i18n.t;
+  const htmlLang = i18n.htmlLang || "pt-BR";
+
+  function sendErrorPage(response, statusCode, title, message, hint) {
+    const safeTitle = title || t(3000);
+    const safeMessage = message || t(3001);
+    const safeHint = hint || t(3002);
+    const html = `<!doctype html>
+<html lang="${htmlLang}">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -130,7 +134,7 @@ function sendErrorPage(response, statusCode, title, message, hint) {
   <body>
     <main class="card">
       <div class="glow" aria-hidden="true"></div>
-      <span class="badge"><span class="dot"></span> An Raemi Labs Web Server</span>
+      <span class="badge"><span class="dot"></span> ${t(3003)}</span>
       <div class="status">${statusCode}</div>
       <h1>${safeTitle}</h1>
       <p>${safeMessage}</p>
@@ -138,32 +142,25 @@ function sendErrorPage(response, statusCode, title, message, hint) {
     </main>
   </body>
 </html>`;
-  response.writeHead(statusCode, { "Content-Type": "text/html; charset=utf-8" });
-  response.end(html);
-}
+    response.writeHead(statusCode, { "Content-Type": "text/html; charset=utf-8" });
+    response.end(html);
+  }
 
-function sendNotFound(response) {
-  sendErrorPage(
-    response,
-    404,
-    "Página não encontrada",
-    "O recurso solicitado não está disponível neste endereço.",
-    "Verifique o endereço, o domínio e tente novamente."
-  );
-}
+  function sendNotFound(response) {
+    sendErrorPage(response, 404, t(3004), t(3005), t(3006));
+  }
 
-function sendForbidden(response) {
-  sendErrorPage(
-    response,
-    403,
-    "Acesso negado",
-    "Este caminho não pode ser acessado pelo servidor.",
-    "Se necessário, ajuste o diretório configurado em websites.json."
-  );
+  function sendForbidden(response) {
+    sendErrorPage(response, 403, t(3007), t(3008), t(3009));
+  }
+
+  return {
+    sendErrorPage,
+    sendNotFound,
+    sendForbidden,
+  };
 }
 
 module.exports = {
-  sendErrorPage,
-  sendNotFound,
-  sendForbidden,
+  createErrorHandlers,
 };

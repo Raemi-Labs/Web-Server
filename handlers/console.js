@@ -10,74 +10,89 @@ function formatDomains(domain) {
   return domain;
 }
 
-function startConsole({ rootDir, getSites, setSites, clearCertCache }) {
+function startConsole({
+  rootDir,
+  getSites,
+  setSites,
+  getClearCertCache,
+  getI18n,
+  restartServer,
+}) {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
     prompt: "web-server> ",
   });
+  const t = (id, params) => getI18n().t(id, params);
 
   const printHelp = () => {
-    console.log("Comandos disponiveis:");
-    console.log("  help                     - Mostra esta ajuda");
-    console.log("  list                     - Lista os sites configurados");
-    console.log("  reload                   - Recarrega todos os sites");
-    console.log("  reload-site <nome>       - Recarrega e valida um site especifico");
-    console.log("  fix-config               - Corrige problemas no websites.json (interativo)");
-    console.log("  create-site <nome> <dominio> [--dev]");
-    console.log("                           - Cria site com root e certificados");
-    console.log("  exit | quit              - Encerra o servidor");
+    console.log(t(1000));
+    console.log(t(1001));
+    console.log(t(1002));
+    console.log(t(1003));
+    console.log(t(1004));
+    console.log(t(1005));
+    console.log(t(1006));
+    console.log(t(1007));
+    console.log(t(1008));
+    console.log(t(1051));
   };
 
   let pendingExit = false;
-  const exitMessage =
-    "Deseja mesmo encerrar o Web Server? Aperte Ctrl + C novamente para confirmar, se quer CANCELAR o encerramento, aperte Enter.";
+
+  const maybeClearCertCache = () => {
+    const clear = getClearCertCache();
+    if (clear) {
+      clear();
+    }
+  };
 
   const reloadAll = () => {
     try {
-      const sites = loadSites(rootDir);
+      const sites = loadSites(rootDir, getI18n());
       setSites(sites);
-      if (clearCertCache) {
-        clearCertCache();
-      }
-      console.log(`Sites recarregados (${sites.length}).`);
+      maybeClearCertCache();
+      console.log(t(1010, { count: sites.length }));
     } catch (error) {
-      console.error(`Falha ao recarregar: ${error.message}`);
+      console.error(t(1011, { error: error.message }));
     }
   };
 
   const reloadSite = (name) => {
     if (!name) {
-      console.log("Uso: reload-site <nome>");
+      console.log(t(1012));
       return;
     }
     try {
-      const sites = loadSites(rootDir);
+      const sites = loadSites(rootDir, getI18n());
       setSites(sites);
-      if (clearCertCache) {
-        clearCertCache();
-      }
+      maybeClearCertCache();
       const site = sites.find((item) => item.name.toLowerCase() === name.toLowerCase());
       if (!site) {
-        console.log(`Site '${name}' nao encontrado no websites.json.`);
+        console.log(t(1013, { name }));
         return;
       }
-      console.log(`Site '${site.name}' recarregado.`);
+      console.log(t(1014, { name: site.name }));
     } catch (error) {
-      console.error(`Falha ao recarregar: ${error.message}`);
+      console.error(t(1011, { error: error.message }));
     }
   };
 
   const listSites = () => {
     const sites = getSites();
     if (!sites.length) {
-      console.log("Nenhum site configurado.");
+      console.log(t(1015));
       return;
     }
     sites.forEach((site) => {
+      const devFlag = site.isDevelop ? t(1050) : "";
       console.log(
-        `- ${site.name} | ${formatDomains(site.domains)} | root=${site.root}` +
-          (site.isDevelop ? " | dev" : "")
+        t(1016, {
+          name: site.name,
+          domains: formatDomains(site.domains),
+          root: site.root,
+          dev: devFlag,
+        })
       );
     });
   };
@@ -89,22 +104,23 @@ function startConsole({ rootDir, getSites, setSites, clearCertCache }) {
         name,
         domain,
         isDevelop: flags.dev,
+        i18n: getI18n(),
       });
       if (!result.ok) {
-        console.log(result.message);
+        console.log(t(result.errorId, result.errorData));
         return;
       }
-      console.log(`Site '${result.site.name}' criado e adicionado ao websites.json.`);
+      console.log(t(1017, { name: result.site.name }));
       if (result.indexCreated) {
-        console.log("Arquivo index.html inicial criado.");
+        console.log(t(1018));
       }
       if (result.certResult.copied) {
-        console.log("Certificados copiados para o diretorio do site.");
+        console.log(t(1019));
       } else {
-        console.log(`Aviso: ${result.certResult.reason}`);
+        console.log(t(1020, { reason: result.certResult.reason }));
       }
     } catch (error) {
-      console.error(`Falha ao criar site: ${error.message}`);
+      console.error(t(1049, { error: error.message }));
     }
   };
 
@@ -126,32 +142,35 @@ function startConsole({ rootDir, getSites, setSites, clearCertCache }) {
     return [domainInput];
   };
 
+  const isYes = (value) => {
+    const normalized = value.toLowerCase();
+    return normalized === "s" || normalized === "sim" || normalized === "y" || normalized === "yes";
+  };
+
   const fixConfig = async () => {
     try {
-      const { configPath, parsed, rawEmpty } = readConfig(rootDir);
+      const { configPath, parsed, rawEmpty } = readConfig(rootDir, getI18n());
       if (!Array.isArray(parsed.sites)) {
         parsed.sites = [];
       }
 
       if (rawEmpty && parsed.sites.length === 0) {
-        const choice = await ask(
-          "websites.json vazio. Deseja apenas criar a base? (s/n): "
-        );
-        if (choice.toLowerCase() === "s" || choice.toLowerCase() === "sim") {
+        const choice = await ask(t(1039));
+        if (isYes(choice)) {
           writeConfig(configPath, parsed);
-          console.log("Base criada com sites vazio.");
+          console.log(t(1040));
           reloadAll();
           return;
         }
 
-        const name = await ask("Nome do site: ");
-        const domain = await ask("Dominio (ex: exemplo.local): ");
+        const name = await ask(t(1041));
+        const domain = await ask(t(1042));
         if (!name || !domain) {
-          console.log("Nome e dominio sao obrigatorios. Nenhuma alteracao feita.");
+          console.log(t(1043));
           return;
         }
-        const devInput = await ask("Modo desenvolvimento? (s/n): ");
-        const isDevelop = devInput.toLowerCase().startsWith("s");
+        const devInput = await ask(t(1044));
+        const isDevelop = isYes(devInput);
 
         const domainValue = normalizeDomains(domain);
         const site = {
@@ -164,7 +183,7 @@ function startConsole({ rootDir, getSites, setSites, clearCertCache }) {
         };
         parsed.sites.push(site);
         writeConfig(configPath, parsed);
-        console.log(`Site '${name}' criado no websites.json.`);
+        console.log(t(1045, { name }));
         reloadAll();
         return;
       }
@@ -175,16 +194,16 @@ function startConsole({ rootDir, getSites, setSites, clearCertCache }) {
       for (let index = 0; index < parsed.sites.length; index += 1) {
         const site = parsed.sites[index];
         if (!site || typeof site !== "object") {
-          console.log(`Removido: entrada invalida na posicao ${index}.`);
+          console.log(t(1028, { index }));
           changed = true;
           continue;
         }
 
         let name = typeof site.name === "string" ? site.name.trim() : "";
         if (!name) {
-          name = await ask(`Site na posicao ${index} sem name. Digite o name (ENTER remove): `);
+          name = await ask(t(1029, { index }));
           if (!name) {
-            console.log(`Removido: site sem name na posicao ${index}.`);
+            console.log(t(1030, { index }));
             changed = true;
             continue;
           }
@@ -193,9 +212,9 @@ function startConsole({ rootDir, getSites, setSites, clearCertCache }) {
 
         let domains = normalizeDomains(site.domain);
         if (!domains.length) {
-          const input = await ask(`Site '${name}' sem domain. Digite o dominio (ENTER remove): `);
+          const input = await ask(t(1031, { name }));
           if (!input) {
-            console.log(`Removido: site '${name}' sem domain.`);
+            console.log(t(1032, { name }));
             changed = true;
             continue;
           }
@@ -207,28 +226,28 @@ function startConsole({ rootDir, getSites, setSites, clearCertCache }) {
         let root = site.root;
         if (!root) {
           root = `websites/${name}`;
-          console.log(`OK: root preenchido para '${name}'.`);
+          console.log(t(1033, { name }));
           changed = true;
         }
 
         let indexFile = site.index;
         if (!indexFile) {
           indexFile = "index.html";
-          console.log(`OK: index preenchido para '${name}'.`);
+          console.log(t(1034, { name }));
           changed = true;
         }
 
         let certificates = site.certificates;
         if (!certificates) {
           certificates = `certificates/${name}`;
-          console.log(`OK: certificates preenchido para '${name}'.`);
+          console.log(t(1035, { name }));
           changed = true;
         }
 
         let isDevelop = site.isDevelop;
         if (typeof isDevelop !== "boolean") {
           isDevelop = false;
-          console.log(`OK: isDevelop ajustado para '${name}'.`);
+          console.log(t(1036, { name }));
           changed = true;
         }
 
@@ -243,7 +262,7 @@ function startConsole({ rootDir, getSites, setSites, clearCertCache }) {
       }
 
       if (!changed) {
-        console.log("Nenhuma correcao necessaria.");
+        console.log(t(1037));
         return;
       }
 
@@ -251,7 +270,7 @@ function startConsole({ rootDir, getSites, setSites, clearCertCache }) {
       writeConfig(configPath, parsed);
       reloadAll();
     } catch (error) {
-      console.error(`Falha ao corrigir: ${error.message}`);
+      console.error(t(1038, { error: error.message }));
     }
   };
 
@@ -260,7 +279,7 @@ function startConsole({ rootDir, getSites, setSites, clearCertCache }) {
     if (pendingExit) {
       pendingExit = false;
       if (!trimmed) {
-        console.log("Encerramento cancelado.");
+        console.log(t(1026));
         rl.prompt();
         return;
       }
@@ -291,6 +310,18 @@ function startConsole({ rootDir, getSites, setSites, clearCertCache }) {
       case "fix-config":
         fixConfig().then(() => rl.prompt());
         return;
+      case "restart":
+        console.log(t(1052));
+        restartServer()
+          .then(() => {
+            console.log(t(1053));
+            rl.prompt();
+          })
+          .catch((error) => {
+            console.error(t(1054, { error: error.message }));
+            rl.prompt();
+          });
+        return;
       case "create-site":
         createSite(args[0], args[1], flags);
         reloadAll();
@@ -301,7 +332,7 @@ function startConsole({ rootDir, getSites, setSites, clearCertCache }) {
         process.exit(0);
         break;
       default:
-        console.log(`Comando desconhecido: ${command}`);
+        console.log(t(1021, { command }));
         printHelp();
         break;
     }
@@ -311,17 +342,17 @@ function startConsole({ rootDir, getSites, setSites, clearCertCache }) {
 
   rl.on("SIGINT", () => {
     if (pendingExit) {
-      console.log("Encerrando servidor.");
+      console.log(t(1027));
       process.exit(0);
       return;
     }
     pendingExit = true;
-    console.log(exitMessage);
+    console.log(t(1025));
     rl.prompt();
   });
 
   rl.on("close", () => {
-    console.log("Console encerrado.");
+    console.log(t(1022));
   });
 
   const banner = `
@@ -332,8 +363,8 @@ function startConsole({ rootDir, getSites, setSites, clearCertCache }) {
     \\_/\\_/ \\___|_.__/  |____/ \\___|_|    \\_/ \\___|_|   
 `;
   console.log(banner);
-  console.log("Bem-vindo, servidor iniciado.");
-  console.log('Para ver todos os comandos, digite "help".');
+  console.log(t(1023));
+  console.log(t(1024));
   rl.prompt();
 }
 

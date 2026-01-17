@@ -3,7 +3,7 @@ const path = require("path");
 
 const { loadSites } = require("./sites");
 
-function readConfig(rootDir) {
+function readConfig(rootDir, i18n) {
   const configPath = path.join(rootDir, "websites.json");
   const raw = fs.readFileSync(configPath, "utf8");
   if (!raw.trim()) {
@@ -12,7 +12,8 @@ function readConfig(rootDir) {
   }
   const parsed = JSON.parse(raw);
   if (!parsed || typeof parsed !== "object") {
-    throw new Error("Formato invalido em websites.json.");
+    const message = i18n ? i18n.t(5010) : "Formato invalido em websites.json.";
+    throw new Error(message);
   }
   if (!Array.isArray(parsed.sites)) {
     parsed.sites = [];
@@ -28,7 +29,7 @@ function ensureDir(targetDir) {
   fs.mkdirSync(targetDir, { recursive: true });
 }
 
-function copyFallbackCertificates(rootDir, destDir) {
+function copyFallbackCertificates(rootDir, destDir, i18n) {
   const fallbackDir = path.join(rootDir, "certs");
   const srcKey = path.join(fallbackDir, "cert.key");
   const srcCert = path.join(fallbackDir, "cert.crt");
@@ -36,7 +37,8 @@ function copyFallbackCertificates(rootDir, destDir) {
   const destCert = path.join(destDir, "cert.crt");
 
   if (!fs.existsSync(srcKey) || !fs.existsSync(srcCert)) {
-    return { copied: false, reason: "Certificados padrao ausentes em certs/." };
+    const reason = i18n ? i18n.t(6010) : "Certificados padrao ausentes em certs/.";
+    return { copied: false, reason };
   }
 
   fs.copyFileSync(srcKey, destKey);
@@ -106,20 +108,20 @@ function normalizeDomains(domainInput) {
   return [domainInput];
 }
 
-function createSiteInConfig({ rootDir, name, domain, isDevelop }) {
+function createSiteInConfig({ rootDir, name, domain, isDevelop, i18n }) {
   if (!name || !domain) {
-    return { ok: false, message: "Uso: create-site <nome> <dominio> [--dev]" };
+    return { ok: false, errorId: 1046 };
   }
   if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
-    return { ok: false, message: "Nome invalido. Use letras, numeros, - ou _." };
+    return { ok: false, errorId: 1047 };
   }
 
-  const { configPath, parsed } = readConfig(rootDir);
+  const { configPath, parsed } = readConfig(rootDir, i18n);
   const existing = parsed.sites.find(
     (site) => site.name.toLowerCase() === name.toLowerCase()
   );
   if (existing) {
-    return { ok: false, message: `Ja existe um site com o nome '${name}'.` };
+    return { ok: false, errorId: 1048, errorData: { name } };
   }
 
   const domainValue = normalizeDomains(domain);
@@ -140,7 +142,7 @@ function createSiteInConfig({ rootDir, name, domain, isDevelop }) {
   ensureDir(path.join(rootDir, rootPath));
   ensureDir(path.join(rootDir, certPath));
   const indexCreated = createDefaultIndex(rootDir, rootPath, name);
-  const certResult = copyFallbackCertificates(rootDir, path.join(rootDir, certPath));
+  const certResult = copyFallbackCertificates(rootDir, path.join(rootDir, certPath), i18n);
 
   return {
     ok: true,
@@ -150,93 +152,8 @@ function createSiteInConfig({ rootDir, name, domain, isDevelop }) {
   };
 }
 
-function reloadSites(rootDir) {
-  return loadSites(rootDir);
-}
-
-function fixWebsitesConfig(rootDir) {
-  const { configPath, parsed } = readConfig(rootDir);
-  const report = {
-    fixed: [],
-    removed: [],
-    warnings: [],
-    changed: false,
-  };
-
-  const nextSites = [];
-  parsed.sites.forEach((site, index) => {
-    if (!site || typeof site !== "object") {
-      report.removed.push(`Entrada invalida removida na posicao ${index}.`);
-      report.changed = true;
-      return;
-    }
-
-    const name = typeof site.name === "string" ? site.name.trim() : "";
-    if (!name) {
-      report.removed.push(`Site sem nome removido na posicao ${index}.`);
-      report.changed = true;
-      return;
-    }
-
-    let root = site.root;
-    if (!root) {
-      root = `websites/${name}`;
-      report.fixed.push(`Root preenchido para '${name}'.`);
-      report.changed = true;
-    }
-
-    let indexFile = site.index;
-    if (!indexFile) {
-      indexFile = "index.html";
-      report.fixed.push(`Index preenchido para '${name}'.`);
-      report.changed = true;
-    }
-
-    const domainValue = normalizeDomains(site.domain);
-    if (!domainValue.length) {
-      report.removed.push(`Site '${name}' removido por falta de dominio.`);
-      report.changed = true;
-      return;
-    }
-    const normalizedDomain = domainValue.length === 1 ? domainValue[0] : domainValue;
-    if (normalizedDomain !== site.domain) {
-      report.fixed.push(`Dominio normalizado para '${name}'.`);
-      report.changed = true;
-    }
-
-    let isDevelop = site.isDevelop;
-    if (typeof isDevelop !== "boolean") {
-      isDevelop = false;
-      report.fixed.push(`isDevelop ajustado para '${name}'.`);
-      report.changed = true;
-    }
-
-    let certificates = site.certificates;
-    if (certificates !== undefined && typeof certificates !== "string") {
-      certificates = undefined;
-      report.fixed.push(`certificates removido por tipo invalido em '${name}'.`);
-      report.changed = true;
-    }
-
-    const nextSite = {
-      name,
-      root,
-      domain: normalizedDomain,
-      index: indexFile,
-      isDevelop,
-    };
-    if (certificates) {
-      nextSite.certificates = certificates;
-    }
-    nextSites.push(nextSite);
-  });
-
-  if (report.changed) {
-    parsed.sites = nextSites;
-    writeConfig(configPath, parsed);
-  }
-
-  return report;
+function reloadSites(rootDir, i18n) {
+  return loadSites(rootDir, i18n);
 }
 
 module.exports = {
@@ -247,5 +164,4 @@ module.exports = {
   createDefaultIndex,
   createSiteInConfig,
   reloadSites,
-  fixWebsitesConfig,
 };

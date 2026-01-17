@@ -9,7 +9,7 @@ const {
   resolveFilePath,
   getContentType,
 } = require("./sites");
-const { sendErrorPage, sendNotFound, sendForbidden } = require("./errors");
+const { createErrorHandlers } = require("./errors");
 
 function serveSiteRequest(site, urlPath, response) {
   let filePath = resolveFilePath(site, urlPath);
@@ -41,7 +41,8 @@ function serveSiteRequest(site, urlPath, response) {
   });
 }
 
-function createRequestHandler(getSites, { allowIpAccess }) {
+function createRequestHandler(getSites, { allowIpAccess, i18n }) {
+  const { sendErrorPage, sendNotFound, sendForbidden } = createErrorHandlers(i18n);
   return (request, response) => {
     const sites = getSites();
     const hostHeader = request.headers.host || "";
@@ -59,9 +60,9 @@ function createRequestHandler(getSites, { allowIpAccess }) {
       sendErrorPage(
         response,
         404,
-        "Domínio não configurado",
-        "Este domínio não está registrado neste servidor.",
-        "Confira o endereço e tente novamente."
+        i18n.t(3010),
+        i18n.t(3011),
+        i18n.t(3012)
       );
       return;
     }
