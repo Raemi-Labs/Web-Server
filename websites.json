@@ -3,9 +3,9 @@
     {
       "name": "example",
       "root": "websites/example",
-      "domain": "loc",
+      "domain": "example",
       "index": "index.html",
-      "isDevelop": true,
+      "isDevelop": false,
       "certificates": "certificates/example"
     }
   ]

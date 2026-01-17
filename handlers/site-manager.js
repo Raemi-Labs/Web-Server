@@ -6,6 +6,10 @@ const { loadSites } = require("./sites");
 function readConfig(rootDir) {
   const configPath = path.join(rootDir, "websites.json");
   const raw = fs.readFileSync(configPath, "utf8");
+  if (!raw.trim()) {
+    const defaultConfig = { sites: [] };
+    return { configPath, parsed: defaultConfig, rawEmpty: true };
+  }
   const parsed = JSON.parse(raw);
   if (!parsed || typeof parsed !== "object") {
     throw new Error("Formato invalido em websites.json.");
@@ -13,7 +17,7 @@ function readConfig(rootDir) {
   if (!Array.isArray(parsed.sites)) {
     parsed.sites = [];
   }
-  return { configPath, parsed };
+  return { configPath, parsed, rawEmpty: false };
 }
 
 function writeConfig(configPath, config) {
@@ -150,6 +154,91 @@ function reloadSites(rootDir) {
   return loadSites(rootDir);
 }
 
+function fixWebsitesConfig(rootDir) {
+  const { configPath, parsed } = readConfig(rootDir);
+  const report = {
+    fixed: [],
+    removed: [],
+    warnings: [],
+    changed: false,
+  };
+
+  const nextSites = [];
+  parsed.sites.forEach((site, index) => {
+    if (!site || typeof site !== "object") {
+      report.removed.push(`Entrada invalida removida na posicao ${index}.`);
+      report.changed = true;
+      return;
+    }
+
+    const name = typeof site.name === "string" ? site.name.trim() : "";
+    if (!name) {
+      report.removed.push(`Site sem nome removido na posicao ${index}.`);
+      report.changed = true;
+      return;
+    }
+
+    let root = site.root;
+    if (!root) {
+      root = `websites/${name}`;
+      report.fixed.push(`Root preenchido para '${name}'.`);
+      report.changed = true;
+    }
+
+    let indexFile = site.index;
+    if (!indexFile) {
+      indexFile = "index.html";
+      report.fixed.push(`Index preenchido para '${name}'.`);
+      report.changed = true;
+    }
+
+    const domainValue = normalizeDomains(site.domain);
+    if (!domainValue.length) {
+      report.removed.push(`Site '${name}' removido por falta de dominio.`);
+      report.changed = true;
+      return;
+    }
+    const normalizedDomain = domainValue.length === 1 ? domainValue[0] : domainValue;
+    if (normalizedDomain !== site.domain) {
+      report.fixed.push(`Dominio normalizado para '${name}'.`);
+      report.changed = true;
+    }
+
+    let isDevelop = site.isDevelop;
+    if (typeof isDevelop !== "boolean") {
+      isDevelop = false;
+      report.fixed.push(`isDevelop ajustado para '${name}'.`);
+      report.changed = true;
+    }
+
+    let certificates = site.certificates;
+    if (certificates !== undefined && typeof certificates !== "string") {
+      certificates = undefined;
+      report.fixed.push(`certificates removido por tipo invalido em '${name}'.`);
+      report.changed = true;
+    }
+
+    const nextSite = {
+      name,
+      root,
+      domain: normalizedDomain,
+      index: indexFile,
+      isDevelop,
+    };
+    if (certificates) {
+      nextSite.certificates = certificates;
+    }
+    nextSites.push(nextSite);
+  });
+
+  if (report.changed) {
+    parsed.sites = nextSites;
+    writeConfig(configPath, parsed);
+  }
+
+  return report;
+}
+
 module.exports = {
   readConfig,
   writeConfig,
@@ -158,4 +247,5 @@ module.exports = {
   createDefaultIndex,
   createSiteInConfig,
   reloadSites,
+  fixWebsitesConfig,
 };
