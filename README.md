@@ -1,16 +1,16 @@
-# Web-Server
+# Web-Server 🚀
 
-Idiomas / Languages: [PT-BR](#pt-br) | [EN](#en) | [KO](#ko) | [JA](#ja)
+Idiomas / Languages: [PT-BR](#pt-br) | [EN](#en) | [KO](#ko) | [JA](#ja) 🌍
 
-Nota: o `config.json` vem com `lang` padrão em **inglês (`en`)**, mas o sistema possui fallback interno em **português (`pt`)** caso o arquivo de idioma não exista ou esteja incompleto.
+Nota: o `config.json` vem com `lang` padrão em **inglês (`en`)**, mas o sistema possui fallback interno em **português (`pt`)** caso o arquivo de idioma não exista ou esteja incompleto. 🧭
 
 ---
 
-## PT-BR
+## PT-BR 🇧🇷
 
 Servidor web simples em Node.js com Express, que inicia nas portas 80 (HTTP) e 443 (HTTPS) e serve múltiplos sites configurados via `websites.json`.
 
-### Estrutura
+### Estrutura 🧩
 
 - `server.js`: servidor principal.
 - `handlers/`: funções de configuração, roteamento e certificados.
@@ -23,7 +23,7 @@ Servidor web simples em Node.js com Express, que inicia nas portas 80 (HTTP) e 4
 - `config.json`: configurações de portas e idioma.
 - `languages/`: arquivos de idioma adicionais (ex: `en.json`, `ko.json`, `ja.json`).
 
-### Como usar
+### Como usar ✅
 
 1. Edite o arquivo `websites.json` para apontar os sites e, se quiser, o diretório de certificados.
 2. Adicione o conteúdo do site dentro de `websites/<nome>`.
@@ -42,7 +42,7 @@ npm start
 
 > Observação: se um site não tiver certificados válidos em `certificates/`, o HTTPS usa o fallback de `certs/` (`cert.key` e `cert.crt`).
 
-### Configuração do servidor
+### Configuração do servidor ⚙️
 
 O arquivo `config.json` define as portas e o idioma do servidor:
 
@@ -70,7 +70,7 @@ Para usar KO:
 Para usar JA:
 - `lang`: `ja`
 
-### Console
+### Console 🖥️
 
 Com o servidor rodando, use o console no terminal para administrar os sites:
 
@@ -82,7 +82,7 @@ Com o servidor rodando, use o console no terminal para administrar os sites:
 - `create-site <nome> <dominio> [--dev]`: cria o site, pastas e certificados.
 - `restart`: reinicia o servidor e recarrega configurações.
 
-### Painel admin
+### Painel admin 🛠️
 
 O painel admin roda na porta `8888` e exige autenticação básica.
 
@@ -95,17 +95,17 @@ Funções disponíveis:
 - Recarregar todos os sites ou um site específico.
 - Visualizar logs de acesso.
 
-### Licença
+### Licença 📄
 
 Este projeto está licenciado sob os termos do arquivo `LICENSE`.
 
 ---
 
-## EN
+## EN 🇺🇸
 
 Simple Node.js web server with Express that starts on ports 80 (HTTP) and 443 (HTTPS) and serves multiple sites configured via `websites.json`.
 
-### Structure
+### Structure 🧩
 
 - `server.js`: main server.
 - `handlers/`: configuration, routing, and certificate handlers.
@@ -118,7 +118,7 @@ Simple Node.js web server with Express that starts on ports 80 (HTTP) and 443 (H
 - `config.json`: ports and language configuration.
 - `languages/`: additional language files (e.g. `en.json`, `ko.json`, `ja.json`).
 
-### Usage
+### Usage ✅
 
 1. Edit `websites.json` to configure sites and (optionally) certificate folders.
 2. Add site content under `websites/<name>`.
@@ -137,7 +137,7 @@ npm start
 
 > Note: if a site does not have valid certificates in `certificates/`, HTTPS falls back to `certs/` (`cert.key` and `cert.crt`).
 
-### Server configuration
+### Server configuration ⚙️
 
 The `config.json` file defines server ports and language:
 
@@ -165,7 +165,7 @@ To use KO:
 To use JA:
 - `lang`: `ja`
 
-### Console
+### Console 🖥️
 
 With the server running, use the terminal console to manage sites:
 
@@ -177,7 +177,7 @@ With the server running, use the terminal console to manage sites:
 - `create-site <name> <domain> [--dev]`: creates the site, folders, and certificates.
 - `restart`: restarts the server and reloads configuration.
 
-### Admin panel
+### Admin panel 🛠️
 
 The admin panel listens on port `8888` and uses basic authentication.
 
@@ -190,17 +190,17 @@ Available features:
 - Reload all sites or a specific site.
 - View access logs.
 
-### License
+### License 📄
 
 This project is licensed under the terms of the `LICENSE` file.
 
 ---
 
-## KO
+## KO 🇰🇷
 
 Node.js와 Express로 구성된 간단한 웹 서버로, 80(HTTP)과 443(HTTPS) 포트에서 시작되며 `websites.json`으로 여러 사이트를 제공합니다.
 
-### 구조
+### 구조 🧩
 
 - `server.js`: 메인 서버.
 - `handlers/`: 설정, 라우팅, 인증서 처리.
@@ -213,7 +213,7 @@ Node.js와 Express로 구성된 간단한 웹 서버로, 80(HTTP)과 443(HTTPS) 
 - `config.json`: 포트 및 언어 설정.
 - `languages/`: 추가 언어 파일(예: `en.json`, `ko.json`, `ja.json`).
 
-### 사용 방법
+### 사용 방법 ✅
 
 1. `websites.json`을 편집해 사이트와 (선택) 인증서 폴더를 설정합니다.
 2. 사이트 콘텐츠를 `websites/<name>` 아래에 추가합니다.
@@ -232,7 +232,7 @@ npm start
 
 > 참고: 사이트에 유효한 인증서가 없으면 HTTPS는 `certs/`(`cert.key`, `cert.crt`)를 사용합니다.
 
-### 서버 설정
+### 서버 설정 ⚙️
 
 `config.json`에서 포트와 언어를 설정합니다:
 
@@ -260,7 +260,7 @@ KO 사용:
 JA 사용:
 - `lang`: `ja`
 
-### 콘솔
+### 콘솔 🖥️
 
 서버 실행 중 터미널 콘솔에서 사이트를 관리할 수 있습니다:
 
@@ -272,7 +272,7 @@ JA 사용:
 - `create-site <name> <domain> [--dev]`: 사이트, 폴더, 인증서 생성.
 - `restart`: 서버 재시작 및 설정 다시 로드.
 
-### 관리자 패널
+### 관리자 패널 🛠️
 
 관리자 패널은 `8888` 포트에서 동작하며 기본 인증을 사용합니다.
 
@@ -285,17 +285,17 @@ JA 사용:
 - 모든 사이트 또는 특정 사이트 다시 로드.
 - 접근 로그 보기.
 
-### 라이선스
+### 라이선스 📄
 
 이 프로젝트는 `LICENSE` 파일의 조건에 따라 사용됩니다.
 
 ---
 
-## JA
+## JA 🇯🇵
 
 Node.js と Express で構成されたシンプルな Web サーバーで、80(HTTP) と 443(HTTPS) のポートで起動し、`websites.json` で複数サイトを提供します。
 
-### 構成
+### 構成 🧩
 
 - `server.js`: メインサーバー。
 - `handlers/`: 設定、ルーティング、証明書処理。
@@ -308,7 +308,7 @@ Node.js と Express で構成されたシンプルな Web サーバーで、80(H
 - `config.json`: ポートと言語の設定。
 - `languages/`: 追加言語ファイル(例: `en.json`, `ko.json`, `ja.json`)。
 
-### 使い方
+### 使い方 ✅
 
 1. `websites.json` を編集してサイトと(任意で)証明書フォルダを設定します。
 2. `websites/<name>` にサイト内容を追加します。
@@ -327,7 +327,7 @@ npm start
 
 > 注: サイトに有効な証明書がない場合、HTTPS は `certs/`(`cert.key`, `cert.crt`)にフォールバックします。
 
-### サーバー設定
+### サーバー設定 ⚙️
 
 `config.json` でポートと言語を設定します:
 
@@ -355,7 +355,7 @@ KO を使う場合:
 JA を使う場合:
 - `lang`: `ja`
 
-### コンソール
+### コンソール 🖥️
 
 サーバー起動中はターミナルのコンソールでサイトを管理できます:
 
@@ -367,7 +367,7 @@ JA を使う場合:
 - `create-site <name> <domain> [--dev]`: サイト、フォルダ、証明書を作成。
 - `restart`: サーバー再起動と設定再読み込み。
 
-### 管理パネル
+### 管理パネル 🛠️
 
 管理パネルは `8888` ポートで動作し、ベーシック認証を使用します。
 
@@ -380,6 +380,6 @@ JA を使う場合:
 - 全サイトまたは特定サイトの再読み込み。
 - アクセスログの表示。
 
-### ライセンス
+### ライセンス 📄
 
 このプロジェクトは `LICENSE` ファイルの条件のもとで提供されます。
