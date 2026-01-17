@@ -129,6 +129,15 @@ const defaultMessages = {
   6003: "O campo certificates precisa ser string quando informado.",
   6004: "Certificados padrao nao encontrados em certs/ (cert.key e cert.crt).",
   6010: "Certificados padrao ausentes em certs/.",
+  6005: "O campo letsencrypt precisa ser booleano quando informado.",
+  6006: "O campo letsencryptNextRenewal precisa ser string quando informado.",
+
+  7000: "Let's Encrypt desabilitado: acmeEmail nao configurado.",
+  7001: "Let's Encrypt: tentando emitir certificado para {site}.",
+  7002: "Let's Encrypt: certificado atualizado para {site}.",
+  7003: "Let's Encrypt: falha ao emitir para {site}: {error}",
+  7004: "Let's Encrypt: novas tentativas em {minutes} min para {site}.",
+  7005: "Let's Encrypt: limite de tentativas atingido para {site}.",
 };
 
 function normalizeLang(lang) {

@@ -43,7 +43,21 @@ function serveSiteRequest(site, urlPath, response) {
 
 function createRequestHandler(getSites, { allowIpAccess, i18n }) {
   const { sendErrorPage, sendNotFound, sendForbidden } = createErrorHandlers(i18n);
-  return (request, response) => {
+  const handler = (request, response) => {
+    const urlPath = request.url || "/";
+    if (handler.acmeChallengeDir && urlPath.startsWith("/.well-known/acme-challenge/")) {
+      const token = decodeURIComponent(urlPath.split("/").pop() || "");
+      const filePath = path.join(handler.acmeChallengeDir, token);
+      fs.readFile(filePath, "utf8", (error, content) => {
+        if (error) {
+          sendNotFound(response);
+          return;
+        }
+        response.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
+        response.end(content);
+      });
+      return;
+    }
     const sites = getSites();
     const hostHeader = request.headers.host || "";
     const hostname = parseHostname(hostHeader);
@@ -67,8 +81,10 @@ function createRequestHandler(getSites, { allowIpAccess, i18n }) {
       return;
     }
 
-    return serveSiteRequest(site, request.url || "/", response);
+    return serveSiteRequest(site, urlPath, response);
   };
+  handler.acmeChallengeDir = null;
+  return handler;
 }
 
 module.exports = {

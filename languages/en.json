@@ -122,5 +122,14 @@
   "6002": "isDevelop must be boolean when provided.",
   "6003": "certificates must be a string when provided.",
   "6004": "Default certificates not found in certs/ (cert.key and cert.crt).",
-  "6010": "Default certificates missing in certs/."
+  "6010": "Default certificates missing in certs/.",
+  "6005": "letsencrypt must be boolean when provided.",
+  "6006": "letsencryptNextRenewal must be a string when provided.",
+
+  "7000": "Let's Encrypt disabled: acmeEmail not configured.",
+  "7001": "Let's Encrypt: attempting to issue for {site}.",
+  "7002": "Let's Encrypt: certificate updated for {site}.",
+  "7003": "Let's Encrypt: failed to issue for {site}: {error}",
+  "7004": "Let's Encrypt: retrying in {minutes} min for {site}.",
+  "7005": "Let's Encrypt: retry limit reached for {site}."
 }

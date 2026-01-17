@@ -117,5 +117,13 @@
     "1051":  "  restart                  - サーバーを再起動して設定を再読み込み",
     "1052":  "サーバーを再起動しています...",
     "1053":  "サーバーを再起動しました。",
-    "1054":  "再起動に失敗しました: {error}"
+    "1054":  "再起動に失敗しました: {error}",
+    "6005":  "letsencrypt は指定される場合 boolean である必要があります。",
+    "6006":  "letsencryptNextRenewal は指定される場合文字列である必要があります。",
+    "7000":  "Let\u0027s Encrypt 無効: acmeEmail が設定されていません。",
+    "7001":  "Let\u0027s Encrypt: {site} の発行を試行中。",
+    "7002":  "Let\u0027s Encrypt: {site} の証明書を更新しました。",
+    "7003":  "Let\u0027s Encrypt: {site} の発行に失敗: {error}",
+    "7004":  "Let\u0027s Encrypt: {site} を {minutes} 分後に再試行。",
+    "7005":  "Let\u0027s Encrypt: {site} の再試行上限に達しました。"
 }
