@@ -33,6 +33,12 @@ function loadSites(rootDir, i18n) {
     if (site.certificates !== undefined && typeof site.certificates !== "string") {
       throw new Error(t ? t(6003) : "O campo certificates precisa ser string quando informado.");
     }
+    if (site["pretty-url"] !== undefined && typeof site["pretty-url"] !== "boolean") {
+      throw new Error(t ? t(6004) : "O campo pretty-url precisa ser booleano quando informado.");
+    }
+    if (site.prettyUrl !== undefined && typeof site.prettyUrl !== "boolean") {
+      throw new Error(t ? t(6004) : "O campo prettyUrl precisa ser booleano quando informado.");
+    }
     const domains = Array.isArray(site.domain) ? site.domain : [site.domain];
     return {
       name: site.name,
@@ -41,6 +47,7 @@ function loadSites(rootDir, i18n) {
       index: site.index,
       isDevelop: Boolean(site.isDevelop),
       certificates: site.certificates ? path.resolve(rootDir, site.certificates) : null,
+      prettyUrl: Boolean(site["pretty-url"] ?? site.prettyUrl),
     };
   });
 }

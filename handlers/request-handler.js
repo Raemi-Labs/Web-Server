@@ -11,7 +11,23 @@ const {
 } = require("./sites");
 const { createErrorHandlers } = require("./errors");
 
-function serveSiteRequest(site, urlPath, response) {
+function serveSiteRequest(site, urlPath, response, { sendNotFound, sendForbidden }) {
+  const rawPath = (urlPath || "/").split("?")[0];
+  const lowerPath = rawPath.toLowerCase();
+  if (site.prettyUrl) {
+    if (lowerPath === "/index.html") {
+      response.writeHead(301, { Location: "/" });
+      response.end();
+      return;
+    }
+    if (lowerPath.endsWith(".html")) {
+      const prettyPath = rawPath.slice(0, -5) || "/";
+      response.writeHead(301, { Location: prettyPath });
+      response.end();
+      return;
+    }
+  }
+
   let filePath = resolveFilePath(site, urlPath);
 
   if (!filePath) {
@@ -19,9 +35,31 @@ function serveSiteRequest(site, urlPath, response) {
     return;
   }
 
+  const tryHtmlFallback = (basePath) => {
+    if (!site.prettyUrl || path.extname(basePath)) {
+      sendNotFound(response);
+      return;
+    }
+    const htmlPath = `${basePath}.html`;
+    fs.stat(htmlPath, (fallbackError, fallbackStats) => {
+      if (fallbackError || fallbackStats.isDirectory()) {
+        sendNotFound(response);
+        return;
+      }
+      fs.readFile(htmlPath, (readError, content) => {
+        if (readError) {
+          sendNotFound(response);
+          return;
+        }
+        response.writeHead(200, { "Content-Type": getContentType(htmlPath) });
+        response.end(content);
+      });
+    });
+  };
+
   fs.stat(filePath, (error, stats) => {
     if (error) {
-      sendNotFound(response);
+      tryHtmlFallback(filePath);
       return;
     }
 
@@ -55,7 +93,7 @@ function createRequestHandler(getSites, { allowIpAccess, i18n }) {
       if (allowIpAccess && (net.isIP(hostname) || isLocalhost)) {
         const devMatch = findDevSiteFromPath(request.url || "/", sites);
         if (devMatch) {
-          return serveSiteRequest(devMatch.site, devMatch.urlPath, response);
+          return serveSiteRequest(devMatch.site, devMatch.urlPath, response, { sendNotFound, sendForbidden });
         }
       }
       sendErrorPage(
@@ -68,7 +106,7 @@ function createRequestHandler(getSites, { allowIpAccess, i18n }) {
       return;
     }
 
-    return serveSiteRequest(site, urlPath, response);
+    return serveSiteRequest(site, urlPath, response, { sendNotFound, sendForbidden });
   };
   return handler;
 }
